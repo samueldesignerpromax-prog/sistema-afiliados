@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Affiliate Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2 class="auth-title">📝 Criar Conta</h2>
+            <div id="message" style="display: none;"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>👤 Nome Completo</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label>📧 Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>🔒 Senha</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label>🎯 Tipo de Conta</label>
+                    <select id="role">
+                        <option value="seller">💼 Vendedor (20% comissão)</option>
+                        <option value="affiliate">🤝 Afiliado (30% comissão)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Cadastrar</button>
+            </form>
+            <div class="auth-link">
+                Já tem conta? <a href="/login.html">Faça login</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        // Preencher role da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const roleParam = urlParams.get('role');
+        if (roleParam && (roleParam === 'seller' || roleParam === 'affiliate')) {
+            document.getElementById('role').value = roleParam;
+        }
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            
+            try {
+                const data = await apiCall('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({ name, email, password, role })
+                });
+                
+                setAuthToken(data.token);
+                setUser(data.user);
+                showMessage('Cadastro realizado com sucesso!', 'success');
+                
+                setTimeout(() => {
+                    redirectToDashboard();
+                }, 1000);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
