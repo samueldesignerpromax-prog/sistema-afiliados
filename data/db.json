@@ -1,0 +1,52 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Admin",
+      "email": "admin@admin.com",
+      "password": "$2a$10$YourHashedPasswordHere",
+      "role": "admin",
+      "totalSales": 5000,
+      "isActive": true
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "name": "Curso de JavaScript Completo",
+      "description": "Aprenda JavaScript do zero ao avançado",
+      "price": 297,
+      "category": "tecnologia",
+      "imageUrl": "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=300",
+      "salesCount": 45
+    },
+    {
+      "id": "2",
+      "name": "Marketing Digital para Iniciantes",
+      "description": "Domine as estratégias de marketing digital",
+      "price": 197,
+      "category": "marketing",
+      "imageUrl": "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?w=300",
+      "salesCount": 32
+    },
+    {
+      "id": "3",
+      "name": "Culinária Saudável",
+      "description": "Receitas deliciosas e nutritivas",
+      "price": 97,
+      "category": "culinaria",
+      "imageUrl": "https://images.unsplash.com/photo-1466637574441-749b8f1943ff?w=300",
+      "salesCount": 28
+    },
+    {
+      "id": "4",
+      "name": "Desenvolvimento Pessoal",
+      "description": "Transforme sua vida e carreira",
+      "price": 147,
+      "category": "desenvolvimento",
+      "imageUrl": "https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=300",
+      "salesCount": 51
+    }
+  ],
+  "sales": []
+}
