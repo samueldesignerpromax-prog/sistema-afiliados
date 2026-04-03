@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Produto - Affiliate Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">✨ Criar Produto</a>
+            <div class="nav-links">
+                <a href="/seller-dashboard.html">Dashboard</a>
+                <a href="/products.html">Produtos</a>
+                <a href="/reports.html">Relatórios</a>
+                <a href="#" onclick="logout()">Sair</a>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <h2>✨ Cadastrar Seu Produto Digital</h2>
+            
+            <div class="alert alert-info">
+                <strong>💰 Taxa de cadastro: R$ 29,90</strong><br>
+                Ao cadastrar seu produto, você poderá vendê-lo na plataforma e ganhar 50% das vendas!
+            </div>
+            
+            <form id="productForm">
+                <div class="form-group">
+                    <label>📝 Nome do Produto *</label>
+                    <input type="text" id="name" required placeholder="Ex: Curso de Fotografia">
+                </div>
+                <div class="form-group">
+                    <label>📖 Descrição</label>
+                    <textarea id="description" rows="4" placeholder="Descreva seu produto..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>💰 Preço (R$) *</label>
+                    <input type="number" id="price" step="0.01" required placeholder="97.00">
+                </div>
+                <div class="form-group">
+                    <label>📂 Categoria</label>
+                    <select id="category">
+                        <option value="tecnologia">💻 Tecnologia</option>
+                        <option value="marketing">📈 Marketing Digital</option>
+                        <option value="culinaria">🍳 Culinária</option>
+                        <option value="desenvolvimento">🌟 Desenvolvimento Pessoal</option>
+                        <option value="outros">🎯 Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>🖼️ URL da Imagem</label>
+                    <input type="url" id="imageUrl" placeholder="https://exemplo.com/imagem.jpg">
+                </div>
+                
+                <div class="form-group">
+                    <label>💳 Forma de Pagamento (Simulação)</label>
+                    <select id="paymentMethod">
+                        <option value="card">💳 Cartão de Crédito</option>
+                        <option value="pix">📱 PIX</option>
+                        <option value="boleto">📄 Boleto</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn" style="width: 100%;">
+                    💰 Pagar R$ 29,90 e Cadastrar Produto
+                </button>
+            </form>
+            
+            <p style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: #718096;">
+                * Após o cadastro, seu produto estará disponível para todos os usuários da plataforma<br>
+                * Você receberá 50% de cada venda do seu produto!
+            </p>
+        </div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        const user = getUser();
+        if (!user) {
+            window.location.href = '/login.html';
+        }
+        
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!confirm('Confirmar cadastro do produto com taxa de R$ 29,90?')) return;
+            
+            try {
+                const productData = {
+                    name: document.getElementById('name').value,
+                    description: document.getElementById('description').value,
+                    price: parseFloat(document.getElementById('price').value),
+                    category: document.getElementById('category').value,
+                    imageUrl: document.getElementById('imageUrl').value
+                };
+                
+                const result = await apiCall('/data/register-product', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                alert('✅ ' + result.message);
+                window.location.href = '/products.html';
+            } catch (error) {
+                alert('❌ Erro ao cadastrar produto: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>
