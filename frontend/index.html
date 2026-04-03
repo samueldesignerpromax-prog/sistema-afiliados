@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Platform - Sistema de Afiliados</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">🚀 Affiliate Platform</a>
+            <div class="nav-links">
+                <a href="/products.html">📚 Produtos</a>
+                <a href="/login.html">🔑 Login</a>
+                <a href="/register.html">📝 Cadastro</a>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <div style="text-align: center; padding: 80px 20px;">
+            <h1 style="font-size: 3.5rem; margin-bottom: 20px; color: white;">
+                Ganhe Dinheiro<br>
+                <span style="background: linear-gradient(135deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Vendendo Cursos Online
+                </span>
+            </h1>
+            <p style="font-size: 1.3rem; margin-bottom: 40px; color: rgba(255,255,255,0.9);">
+                Plataforma completa para afiliados, vendedores e criadores de conteúdo
+            </p>
+            
+            <div class="card-grid" style="margin-top: 50px;">
+                <div class="product-card">
+                    <div class="product-info" style="text-align: center;">
+                        <div style="font-size: 3rem;">💰</div>
+                        <h3>Para Vendedores</h3>
+                        <p>Ganhe 20% de comissão em cada venda</p>
+                        <p style="color: #667eea; font-weight: bold;">Meta: 5 vendas vira Afiliado</p>
+                        <a href="/register.html?role=seller" class="btn" style="margin-top: 15px;">Começar Agora</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-info" style="text-align: center;">
+                        <div style="font-size: 3rem;">🤝</div>
+                        <h3>Para Afiliados</h3>
+                        <p>Ganhe 30% de comissão em cada venda</p>
+                        <p style="color: #667eea; font-weight: bold;">Recrute e ganhe mais</p>
+                        <a href="/register.html?role=affiliate" class="btn" style="margin-top: 15px;">Ser Afiliado</a>
+                    </div>
+                </div>
+                
+                <div class="product-card">
+                    <div class="product-info" style="text-align: center;">
+                        <div style="font-size: 3rem;">🎓</div>
+                        <h3>Para Criadores</h3>
+                        <p>Cadastre seu produto digital</p>
+                        <p style="color: #667eea; font-weight: bold;">Ganhe 50% das vendas</p>
+                        <a href="/register-product.html" class="btn" style="margin-top: 15px;">Cadastrar Produto</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 60px; background: rgba(255,255,255,0.1); border-radius: 15px; padding: 30px;">
+                <h2 style="color: white; margin-bottom: 20px;">📊 Como Funciona?</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; color: white;">
+                    <div>
+                        <div style="font-size: 2rem;">1️⃣</div>
+                        <h3>Cadastre-se</h3>
+                        <p>Escolha ser Vendedor ou Afiliado</p>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem;">2️⃣</div>
+                        <h3>Divulgue</h3>
+                        <p>Compartilhe seus links exclusivos</p>
+                    </div>
+                    <div>
+                        <div style="font-size: 2rem;">3️⃣</div>
+                        <h3>Ganhe</h3>
+                        <p>Receba comissões automáticas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        if (isAuthenticated()) {
+            redirectToDashboard();
+        }
+    </script>
+</body>
+</html>
