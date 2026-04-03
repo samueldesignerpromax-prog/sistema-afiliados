@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Affiliate Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">📚 Nossos Cursos</a>
+            <div class="nav-links" id="navLinks"></div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1 style="color: white; margin-bottom: 30px; text-align: center;">🎓 Cursos Disponíveis</h1>
+        <div class="card-grid" id="productsContainer"></div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        const user = getUser();
+        const navLinks = document.getElementById('navLinks');
+        
+        if (user) {
+            if (user.role === 'admin') {
+                navLinks.innerHTML = `
+                    <a href="/admin-dashboard.html">Dashboard</a>
+                    <a href="/products.html">Produtos</a>
+                    <a href="/reports.html">Relatórios</a>
+                    <a href="#" onclick="logout()">Sair</a>
+                `;
+            } else if (user.role === 'affiliate') {
+                navLinks.innerHTML = `
+                    <a href="/affiliate-dashboard.html">Dashboard</a>
+                    <a href="/products.html">Produtos</a>
+                    <a href="/reports.html">Relatórios</a>
+                    <a href="#" onclick="logout()">Sair</a>
+                `;
+            } else {
+                navLinks.innerHTML = `
+                    <a href="/seller-dashboard.html">Dashboard</a>
+                    <a href="/products.html">Produtos</a>
+                    <a href="/reports.html">Relatórios</a>
+                    <a href="/register-product.html">Cadastrar Produto</a>
+                    <a href="#" onclick="logout()">Sair</a>
+                `;
+            }
+        } else {
+            navLinks.innerHTML = `
+                <a href="/login.html">Login</a>
+                <a href="/register.html">Cadastro</a>
+            `;
+        }
+        
+        loadProducts('productsContainer');
+    </script>
+</body>
+</html>
