@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Affiliate Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2 class="auth-title">🔐 Login</h2>
+            <div id="message" style="display: none;"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>📧 Email</label>
+                    <input type="email" id="email" required placeholder="seu@email.com">
+                </div>
+                <div class="form-group">
+                    <label>🔒 Senha</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Entrar</button>
+            </form>
+            <div class="auth-link">
+                Não tem conta? <a href="/register.html">Cadastre-se</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const data = await apiCall('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+                
+                setAuthToken(data.token);
+                setUser(data.user);
+                showMessage('Login realizado com sucesso!', 'success');
+                
+                setTimeout(() => {
+                    redirectToDashboard();
+                }, 1000);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        });
+        
+        // Demo accounts
+        console.log('📝 Contas para teste:');
+        console.log('Admin: admin@admin.com / admin123');
+        console.log('Afiliado: afiliado@teste.com / 123456');
+        console.log('Vendedor: vendedor@teste.com / 123456');
+    </script>
+</body>
+</html>
