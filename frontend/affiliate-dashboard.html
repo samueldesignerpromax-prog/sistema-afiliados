@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afiliado Dashboard - Affiliate Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">🤝 Affiliate Area</a>
+            <div class="nav-links">
+                <a href="/affiliate-dashboard.html">Dashboard</a>
+                <a href="/products.html">Produtos</a>
+                <a href="/reports.html">Relatórios</a>
+                <a href="#" onclick="logout()">Sair</a>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1 style="color: white; margin-bottom: 30px;">🤝 Dashboard Afiliado</h1>
+        
+        <div class="dashboard-stats" id="stats"></div>
+        
+        <div class="card">
+            <h2>🔗 Seus Links de Afiliado</h2>
+            <button onclick="createAffiliateLink()" class="btn btn-success" style="margin-bottom: 20px;">
+                ➕ Gerar Novo Link
+            </button>
+            <div id="linksList"></div>
+        </div>
+        
+        <div class="card">
+            <h2>💰 Vendas Geradas</h2>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr><th>Produto</th><th>Valor</th><th>Sua Comissão</th><th>Data</th></tr>
+                    </thead>
+                    <tbody id="salesList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        async function loadAffiliateData() {
+            try {
+                const user = getUser();
+                if (!user || user.role !== 'affiliate') {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                // Load sales
+                const sales = await apiCall('/data/sales');
+                const totalCommission = sales.reduce((sum, sale) => sum + (sale.affiliateCommission || 0), 0);
+                
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat-card">
+                        <h3>📊 Total Vendas</h3>
+                        <div class="stat-value">${sales.length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>💰 Comissão Total</h3>
+                        <div class="stat-value">R$ ${totalCommission.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>🚀 Comissão por Venda</h3>
+                        <div class="stat-value">30%</div>
+                    </div>
+                `;
+                
+                // Load affiliate links
+                const links = await apiCall('/data/affiliate/links');
+                document.getElementById('linksList').innerHTML = links.map(link => `
+                    <div class="alert alert-success">
+                        <strong>🔗 Link:</strong> 
+                        <code style="background: #f0f0f0; padding: 5px; border-radius: 5px;">${window.location.origin}/?ref=${link.code}</code>
+                        <button onclick="copyToClipboard('${window.location.origin}/?ref=${link.code}')" class="btn btn-sm" style="margin-left: 10px;">📋 Copiar</button>
+                    </div>
+                `).join('');
+                
+                if (links.length === 0) {
+                    document.getElementById('linksList').innerHTML = '<p>Nenhum link gerado ainda. Clique no botão acima para criar seu primeiro link!</p>';
+                }
+                
+                // Load sales list
+                document.getElementById('salesList').innerHTML = sales.map(sale => `
+                    <tr>
+                        <td>${sale.product?.name || 'Produto'}</td>
+                        <td>R$ ${sale.amount?.toFixed(2) || '0.00'}</td>
+                        <td style="color: #48bb78; font-weight: bold;">R$ ${sale.affiliateCommission?.toFixed(2) || '0.00'}</td>
+                        <td>${new Date(sale.date).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+                
+                if (sales.length === 0) {
+                    document.getElementById('salesList').innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhuma venda ainda</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        async function createAffiliateLink() {
+            try {
+                await apiCall('/data/affiliate/links', { method: 'POST' });
+                alert('✅ Link gerado com sucesso!');
+                loadAffiliateData();
+            } catch (error) {
+                alert('❌ Erro ao gerar link: ' + error.message);
+            }
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            alert('✅ Link copiado para a área de transferência!');
+        }
+        
+        window.createAffiliateLink = createAffiliateLink;
+        window.copyToClipboard = copyToClipboard;
+        loadAffiliateData();
+    </script>
+</body>
+</html>
