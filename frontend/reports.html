@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Affiliate Platform</title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">📊 Relatórios</a>
+            <div class="nav-links" id="navLinks"></div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1 style="color: white; margin-bottom: 30px;">📈 Análises e Métricas</h1>
+        
+        <div class="card">
+            <h2>📊 Vendas por Período</h2>
+            <canvas id="salesChart" style="max-height: 400px;"></canvas>
+        </div>
+        
+        <div class="card">
+            <h2>🏆 Produtos Mais Vendidos</h2>
+            <canvas id="productsChart" style="max-height: 400px;"></canvas>
+        </div>
+        
+        <div class="card">
+            <h2>💰 Distribuição de Comissões</h2>
+            <div id="commissionsInfo"></div>
+        </div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        const user = getUser();
+        const navLinks = document.getElementById('navLinks');
+        
+        if (user) {
+            if (user.role === 'admin') {
+                navLinks.innerHTML = `
+                    <a href="/admin-dashboard.html">Dashboard</a>
+                    <a href="/products.html">Produtos</a>
+                    <a href="/reports.html">Relatórios</a>
+                    <a href="#" onclick="logout()">Sair</a>
+                `;
+            } else if (user.role === 'affiliate') {
+                navLinks.innerHTML = `
+                    <a href="/affiliate-dashboard.html">Dashboard</a>
+                    <a href="/products.html">Produtos</a>
+                    <a href="/reports.html">Relatórios</a>
+                    <a href="#" onclick="logout()">Sair</a>
+                `;
+            } else if (user.role === 'seller') {
+                navLinks.innerHTML = `
+                    <a href="/seller-dashboard.html">Dashboard</a>
+                    <a href="/products.html">Produtos</a>
+                    <a href="/reports.html">Relatórios</a>
+                    <a href="/register-product.html">Cadastrar Produto</a>
+                    <a href="#" onclick="logout()">Sair</a>
+                `;
+            }
+        } else {
+            navLinks.innerHTML = `
+                <a href="/login.html">Login</a>
+                <a href="/register.html">Cadastro</a>
+            `;
+        }
+        
+        async function loadReports() {
+            try {
+                const sales = await apiCall('/data/sales');
+                const products = await apiCall('/data/products');
+                
+                // Sales by date (últimos 7 dias)
+                const last7Days = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    last7Days.push(date.toLocaleDateString());
+                }
+                
+                const salesByDate = last7Days.map(date => {
+                    return sales.filter(sale => new Date(sale.date).toLocaleDateString() === date)
+                        .reduce((sum, sale) => sum + sale.amount, 0);
+                });
+                
+                new Chart(document.getElementById('salesChart'), {
+                    type: 'line',
+                    data: {
+                        labels: last7Days,
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: salesByDate,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+                
+                // Top products
+                const productSales = {};
+                products.forEach(product => {
+                    productSales[product.name] = sales.filter(s => s.productId === product.id).length;
+                });
+                
+                const topProducts = Object.entries(productSales)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+                
+                new Chart(document.getElementById('productsChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: topProducts.map(p => p[0]),
+                        datasets: [{
+                            label: 'Número de Vendas',
+                            data: topProducts.map(p => p[1]),
+                            backgroundColor: 'rgba(118, 75, 162, 0.6)',
+                            borderColor: '#764ba2',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+                
+                // Commissions summary
+                const totalOwner = sales.reduce((sum, s) => sum + (s.ownerCommission || 0), 0);
+                const totalAffiliate = sales.reduce((sum, s) => sum + (s.affiliateCommission || 0), 0);
+                const totalSeller = sales.reduce((sum, s) => sum + (s.sellerCommission || 0), 0);
+                
+                document.getElementById('commissionsInfo').innerHTML = `
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <h3>👑 Dono (Admin)</h3>
+                            <div class="stat-value">R$ ${totalOwner.toFixed(2)}</div>
+                            <p style="color: #667eea;">50% das vendas</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>🤝 Afiliados</h3>
+                            <div class="stat-value">R$ ${totalAffiliate.toFixed(2)}</div>
+                            <p style="color: #667eea;">30% das vendas</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>💼 Vendedores</h3>
+                            <div class="stat-value">R$ ${totalSeller.toFixed(2)}</div>
+                            <p style="color: #667eea;">20% das vendas</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading reports:', error);
+            }
+        }
+        
+        loadReports();
+    </script>
+</body>
+</html>
