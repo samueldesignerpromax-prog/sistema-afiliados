@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendedor Dashboard - Affiliate Platform</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="/" class="logo">💼 Seller Area</a>
+            <div class="nav-links">
+                <a href="/seller-dashboard.html">Dashboard</a>
+                <a href="/products.html">Produtos</a>
+                <a href="/reports.html">Relatórios</a>
+                <a href="/register-product.html">Cadastrar Produto</a>
+                <a href="#" onclick="logout()">Sair</a>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1 style="color: white; margin-bottom: 30px;">💼 Dashboard Vendedor</h1>
+        
+        <div class="dashboard-stats" id="stats"></div>
+        
+        <div class="card" id="goalCard">
+            <h2>🎯 Meta para se tornar Afiliado</h2>
+            <div id="goalInfo"></div>
+        </div>
+        
+        <div class="card">
+            <h2>📊 Minhas Vendas</h2>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr><th>Produto</th><th>Valor</th><th>Sua Comissão</th><th>Data</th></tr>
+                    </thead>
+                    <tbody id="salesList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/script.js"></script>
+    <script>
+        async function loadSellerData() {
+            try {
+                const user = getUser();
+                if (!user || user.role !== 'seller') {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                // Load sales
+                const sales = await apiCall('/data/sales');
+                const totalCommission = sales.reduce((sum, sale) => sum + (sale.sellerCommission || 0), 0);
+                const salesCount = sales.length;
+                const remainingToGoal = 5 - salesCount;
+                
+                document.getElementById('stats').innerHTML = `
+                    <div class="stat-card">
+                        <h3>📊 Total Vendas</h3>
+                        <div class="stat-value">${salesCount}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>💰 Comissão Total</h3>
+                        <div class="stat-value">R$ ${totalCommission.toFixed(2)}</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>🚀 Comissão por Venda</h3>
+                        <div class="stat-value">20%</div>
+                    </div>
+                `;
+                
+                // Goal info
+                if (remainingToGoal > 0) {
+                    document.getElementById('goalInfo').innerHTML = `
+                        <div class="alert alert-info">
+                            <strong>🎯 Faltam ${remainingToGoal} venda(s) para você se tornar Afiliado!</strong><br>
+                            <strong>Benefícios de ser Afiliado:</strong>
+                            <ul style="margin-top: 10px;">
+                                <li>✅ Comissão de 30% nas vendas (+10%)</li>
+                                <li>✅ Pode recrutar outros vendedores</li>
+                                <li>✅ Ganha comissão sobre vendas dos seus indicados</li>
+                            </ul>
+                            <div style="background: #e2e8f0; border-radius: 10px; margin-top: 15px; overflow: hidden;">
+                                <div style="width: ${(salesCount/5)*100}%; background: linear-gradient(90deg, #667eea, #764ba2); color: white; padding: 8px; text-align: center;">
+                                    ${salesCount}/5 vendas
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('goalInfo').innerHTML = `
+                        <div class="alert alert-success">
+                            🎉 <strong>Parabéns!</strong> Você atingiu a meta de 5 vendas!<br>
+                            <button onclick="becomeAffiliate()" class="btn btn-success" style="margin-top: 15px;">
+                                🚀 Tornar-se Afiliado Agora
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                // Load sales list
+                document.getElementById('salesList').innerHTML = sales.map(sale => `
+                    <tr>
+                        <td>${sale.product?.name || 'Produto'}</td>
+                        <td>R$ ${sale.amount?.toFixed(2) || '0.00'}</td>
+                        <td style="color: #48bb78; font-weight: bold;">R$ ${sale.sellerCommission?.toFixed(2) || '0.00'}</td>
+                        <td>${new Date(sale.date).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+                
+                if (sales.length === 0) {
+                    document.getElementById('salesList').innerHTML = '<tr><td colspan="4" style="text-align: center;">Nenhuma venda ainda. Comece a vender agora!</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        async function becomeAffiliate() {
+            try {
+                const user = getUser();
+                await apiCall(`/data/admin/users/${user.id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ role: 'affiliate' })
+                });
+                
+                user.role = 'affiliate';
+                setUser(user);
+                
+                alert('🎉 Parabéns! Agora você é um Afiliado!');
+                window.location.href = '/affiliate-dashboard.html';
+            } catch (error) {
+                alert('❌ Erro ao tornar-se afiliado: ' + error.message);
+            }
+        }
+        
+        window.becomeAffiliate = becomeAffiliate;
+        loadSellerData();
+    </script>
+</body>
+</html>
